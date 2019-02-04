@@ -316,6 +316,7 @@
         <configuration>
           <systemPropertyVariables>
             <project.build.directory>${project.build.directory}</project.build.directory>
+            <java.util.logging.config.file>${basedir}/src/test/logging.properties</java.util.logging.config.file>
           </systemPropertyVariables>
         </configuration>
       </plugin>

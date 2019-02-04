@@ -18,6 +18,7 @@ package io.github.ljnelson.helidon.mp.jpa;
 
 import java.util.Collections;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -44,13 +45,17 @@ public class HelloWorldResource {
     super();
   }
 
+  @PostConstruct
+  private void postConstruct() {
+    this.entityManager.merge(new Greeting(1L, "world"));
+  }
+
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Transactional(TxType.REQUIRED)
   public String getDefaultMessage() {
     assert entityManager != null;
-    System.out.println("*** properties: " + entityManager.getProperties());
-    return "world";
+    return entityManager.find(Greeting.class, Long.valueOf(1L)).toString();
   }
 
 }

@@ -8,10 +8,12 @@
       name="test"
       transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>io.github.ljnelson.helidon.mp.jpa.Greeting</class>
     <properties>
       <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
       <property name="eclipselink.deploy-on-startup" value="true"/>
       <property name="eclipselink.jdbc.native-sql" value="true"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
       <property name="eclipselink.target-server" value="org.microbean.eclipselink.cdi.CDISEPlatform"/>
     </properties>
   </persistence-unit>

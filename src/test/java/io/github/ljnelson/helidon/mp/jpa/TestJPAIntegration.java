@@ -1,6 +1,6 @@
 /* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-
  *
- * Copyright © 2019 microBean.
+ * Copyright © 2019 Laird Nelson.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * implied.  See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package org.microbean.helidon.mp.jpa;
+package io.github.ljnelson.helidon.mp.jpa;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

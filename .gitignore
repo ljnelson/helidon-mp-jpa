@@ -1,0 +1,7 @@
+*.class
+*~
+nbactions.xml
+src/site/markdown/*.html
+target/
+ObjectStore/
+PutObjectStoreDirHere/

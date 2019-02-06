@@ -1,5 +1,6 @@
 *.class
 *~
+createDDL_ddlGeneration.jdbc
 nbactions.xml
 src/site/markdown/*.html
 target/

@@ -17,9 +17,13 @@
 package io.github.ljnelson.helidon.mp.jpa;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import java.net.URL;
+import java.net.HttpURLConnection;
 
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.CDI;
@@ -44,11 +48,36 @@ public class TestJPAIntegration {
 
     final int port = server.port();
     
-    final URL url = new URL("http://127.0.0.1:" + port + "/hello");
-    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"))) {
+    final URL url = new URL("http://127.0.0.1:" + port);
+
+    /*
+    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url, "/hello").openStream(), "UTF-8"))) {
       assertEquals("world", reader.readLine());
     }
+    */
 
+    final HttpURLConnection c = (HttpURLConnection)new URL(url, "/hello").openConnection();
+    assertNotNull(c);
+    c.setDoOutput(true);
+    c.setRequestProperty("Content-Type", "text/plain");
+    c.setRequestMethod("POST");
+    final byte[] helloBytes = "hello".getBytes("UTF8");
+    assertNotNull(helloBytes);
+    c.setRequestProperty("Content-Length", String.valueOf(helloBytes.length));
+    try(final OutputStream stream = c.getOutputStream()) {
+      assertNotNull(stream);
+      stream.write(helloBytes, 0, helloBytes.length);
+    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (final InputStream inputStream = c.getInputStream()) {
+      assertNotNull(inputStream);
+      int bytesRead;      
+      final byte[] bytes = new byte[4096];
+      while ((bytesRead = inputStream.read(bytes, 0, bytes.length)) != -1) {
+        baos.write(bytes, 0, bytesRead);
+      }
+    }
+    assertEquals("1", baos.toString("UTF8"));
     // This stops the server.
     ((SeContainer)CDI.current()).close();
   }

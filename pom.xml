@@ -18,6 +18,11 @@
   <inceptionYear>2019</inceptionYear>
   <url>https://github.com/ljnelson/${project.artifactId}</url>
 
+  <organization>
+    <name>Laird Nelson</name>
+    <url>https://lairdnelson.wordpress.com/</url>
+  </organization>
+  
   <scm>
     <connection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:ljnelson/${project.artifactId}.git</developerConnection>
@@ -121,14 +126,14 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-weld-se</artifactId>
-        <version>0.2.6</version>
+        <version>0.2.7</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-cdi</artifactId>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
         <type>jar</type>
       </dependency>
 
@@ -345,7 +350,8 @@
   <properties>
 
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
-    <links>https://helidon.io/docs/latest/apidocs,https://docs.jboss.org/cdi/api/2.0/,https://docs.oracle.com/javaee/7/api/,https://microbean.github.io/microbean-development-annotations/apidocs/,http://jcip.net/annotations/doc/</links>
+    <doctitle>&lt;a href="${project.url}" target="_parent"&gt;${project.artifactId}&lt;/a&gt; ${project.version}</doctitle>
+    <links>https://helidon.io/docs/latest/apidocs,https://docs.jboss.org/cdi/api/2.0/,https://jax-rs.github.io/apidocs/2.1/,http://javax-inject.github.io/javax-inject/api/,https://javaee.github.io/javaee-spec/javadocs/</links>
     <stylesheetfile>css/stylesheet.css</stylesheetfile>
 
   </properties>

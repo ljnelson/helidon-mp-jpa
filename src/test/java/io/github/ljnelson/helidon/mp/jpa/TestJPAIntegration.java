@@ -50,11 +50,9 @@ public class TestJPAIntegration {
     
     final URL url = new URL("http://127.0.0.1:" + port);
 
-    /*
     try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url, "/hello").openStream(), "UTF-8"))) {
       assertEquals("world", reader.readLine());
     }
-    */
 
     final HttpURLConnection c = (HttpURLConnection)new URL(url, "/hello").openConnection();
     assertNotNull(c);

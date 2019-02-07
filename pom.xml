@@ -126,7 +126,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-weld-se</artifactId>
-        <version>0.2.8</version>
+        <version>0.2.9</version>
         <type>jar</type>
       </dependency>
 
@@ -140,7 +140,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <version>0.1.2</version>
+        <version>0.1.4</version>
         <type>jar</type>
       </dependency>
 
@@ -276,17 +276,17 @@
       <plugins>
 
         <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        
+        <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <additionalJOptions combine.children="append">
               <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin</additionalJOption>
             </additionalJOptions>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.1</version>
         </plugin>
 
         <plugin>
@@ -300,6 +300,12 @@
           <version>1.0.5</version>
         </plugin>
 
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>4.0.2</version>
+        </plugin>
+
       </plugins>
     </pluginManagement>
     
@@ -307,13 +313,18 @@
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestEntries>
-              <Automatic-Module-Name>org.microbean.helidon.webserver.cdi</Automatic-Module-Name>
-            </manifestEntries>
-          </archive>
-        </configuration>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <configuration>
+              <archive>
+                <manifestEntries>
+                  <Automatic-Module-Name>io.github.ljnelson.helidon.mp.jpa</Automatic-Module-Name>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       
       <plugin>
@@ -349,6 +360,9 @@
 
   <properties>
 
+    <!-- dependency-check-plugin properties; see -->
+    <suppressionFile>${basedir}/src/dependency-check/suppressions.xml</suppressionFile>
+
     <!-- maven-javadoc-plugin properties; see https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html -->
     <doctitle>&lt;a href="${project.url}" target="_parent"&gt;${project.artifactId}&lt;/a&gt; ${project.version}</doctitle>
     <links>https://helidon.io/docs/latest/apidocs,https://docs.jboss.org/cdi/api/2.0/,https://jax-rs.github.io/apidocs/2.1/,http://javax-inject.github.io/javax-inject/api/,https://javaee.github.io/javaee-spec/javadocs/</links>
@@ -368,6 +382,10 @@
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
       </plugin>
     </plugins>
   </reporting>

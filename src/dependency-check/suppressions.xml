@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+  <suppress>
+    <notes><![CDATA[
+    file name: jsonp-jaxrs-1.1.1.jar
+    ]]></notes>
+    <gav regex="true">^org\.glassfish:jsonp-jaxrs:.*$</gav>
+    <cve>CVE-2013-4407</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    file name: helidon-microprofile-jwt-auth-0.11.0.jar
+    ]]></notes>
+    <gav regex="true">^io\.helidon\.microprofile\.jwt:helidon-microprofile-jwt-auth:.*$</gav>
+    <cve>CVE-2016-7037</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    file name: helidon-security-jwt-0.11.0.jar
+    ]]></notes>
+    <gav regex="true">^io\.helidon\.security:helidon-security-jwt:.*$</gav>
+    <cve>CVE-2016-7037</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    file name: helidon-security-providers-jwt-0.11.0.jar
+    ]]></notes>
+    <gav regex="true">^io\.helidon\.security\.providers:helidon-security-providers-jwt:.*$</gav>
+    <cve>CVE-2016-7037</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+    file name: helidon-microprofile-jwt-auth-cdi-0.11.0.jar
+    ]]></notes>
+    <gav regex="true">^io\.helidon\.microprofile\.jwt:helidon-microprofile-jwt-auth-cdi:.*$</gav>
+    <cve>CVE-2016-7037</cve>
+  </suppress>
+</suppressions>

@@ -16,6 +16,7 @@
       <property name="eclipselink.deploy-on-startup" value="true"/>
       <property name="eclipselink.jdbc.native-sql" value="true"/>
       <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
       <property name="eclipselink.target-server" value="org.microbean.eclipselink.cdi.CDISEPlatform"/>
     </properties>
   </persistence-unit>

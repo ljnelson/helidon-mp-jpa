@@ -17,6 +17,8 @@
 package io.github.ljnelson.helidon.mp.jpa;
 
 import java.util.Objects;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +35,7 @@ import javax.persistence.UniqueConstraint;
  * @author <a href="https://about.me/lairdnelson"
  * target="_parent">Laird Nelson</a>
  */
+@Access(AccessType.FIELD)
 @Entity(name = "Greeting")
 @NamedQuery(name = "findByFirstPart",
             query = "SELECT g FROM Greeting g WHERE g.firstPart = :firstPart")

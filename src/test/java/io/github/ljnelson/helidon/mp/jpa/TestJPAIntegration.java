@@ -16,20 +16,24 @@
  */
 package io.github.ljnelson.helidon.mp.jpa;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-import java.net.URL;
 import java.net.HttpURLConnection;
-
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.CDI;
 
 import io.helidon.microprofile.server.Server;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,24 +41,36 @@ import static org.junit.Assert.assertNotNull;
 
 public class TestJPAIntegration {
 
+  private Server server;
+
+  private URL baseUrl;
+  
   public TestJPAIntegration() {
     super();
   }
 
+  @Before
+  public void startServer() throws MalformedURLException {
+    this.server = Server.create().start();
+    this.baseUrl = new URL("http://127.0.0.1:" + server.port());
+  }
+
+  @After
+  public void stopServer() {
+    this.server.stop();
+    this.baseUrl = null;
+  }
+
   @Test
-  public void testIt() throws Exception {
-    final Server server = Server.create().start();
-    assertNotNull(server);
-
-    final int port = server.port();
-    
-    final URL url = new URL("http://127.0.0.1:" + port);
-
-    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url, "/hello").openStream(), "UTF-8"))) {
+  public void testGet() throws Exception {
+    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(this.baseUrl, "/hello").openStream(), "UTF-8"))) {
       assertEquals("world", reader.readLine());
     }
-
-    final HttpURLConnection c = (HttpURLConnection)new URL(url, "/hello").openConnection();
+  }
+  
+  @Test
+  public void testPost() throws Exception {
+    final HttpURLConnection c = (HttpURLConnection)new URL(this.baseUrl, "/hello").openConnection();
     assertNotNull(c);
     c.setDoOutput(true);
     c.setRequestProperty("Content-Type", "text/plain");
@@ -62,12 +78,12 @@ public class TestJPAIntegration {
     final byte[] helloBytes = "hello".getBytes("UTF8");
     assertNotNull(helloBytes);
     c.setRequestProperty("Content-Length", String.valueOf(helloBytes.length));
-    try(final OutputStream stream = c.getOutputStream()) {
+    try(final OutputStream stream = new BufferedOutputStream(c.getOutputStream())) {
       assertNotNull(stream);
       stream.write(helloBytes, 0, helloBytes.length);
     }
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (final InputStream inputStream = c.getInputStream()) {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (final InputStream inputStream = new BufferedInputStream(c.getInputStream())) {
       assertNotNull(inputStream);
       int bytesRead;      
       final byte[] bytes = new byte[4096];
@@ -76,8 +92,6 @@ public class TestJPAIntegration {
       }
     }
     assertEquals("1", baos.toString("UTF8"));
-    // This stops the server.
-    ((SeContainer)CDI.current()).close();
   }
   
 }

@@ -1158,3 +1158,19 @@ These are my skunkworks projects:
 * [microbean-narayana-jta-weld-se](https://microbean.github.io/microbean-narayana-jta-weld-se/index.html):
   Provides transactional observer support for Weld-based CDI
   implementations.
+
+These are other supporting projects:
+* [Narayana](https://github.com/jbosstm/narayana): A JTA transaction
+  manager.  Battle-tested.  I [helped with the CDI
+  internals](https://github.com/jbosstm/narayana/pull/1346).
+* [Eclipselink](https://github.com/eclipse-ee4j/eclipselink/tree/master/jpa):
+  A JPA implementation.
+* [Weld](https://github.com/weld): the CDI reference implementation.
+* [HikariCP](https://github.com/brettwooldridge/HikariCP): The fastest
+  connection pool implementation.
+* [H2](http://www.h2database.com/html/main.html): A nice little Java
+  database.
+* [Woodstox](https://github.com/FasterXML/woodstox): Stax XML parser
+  that flies.
+* [Jandex](https://github.com/wildfly/jandex): Don't scan annotations
+  by loading classes; look at their efficient indices instead.

@@ -844,6 +844,9 @@ this:
 Here we've defined a persistence unit named `test`.  You'll note
 that's what our `DataSource` was named as well.  That's on purpose.
 
+(Oh, hey, did you see that little `transaction-type="JTA"` nugget in
+there?  That's interesting, isn't it?)
+
 This persistence unit uses Eclipselink as the provider.
 
 There are [various Eclipselink-specific

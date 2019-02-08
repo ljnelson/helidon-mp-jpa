@@ -523,4 +523,230 @@ this (obviously sanity-check the versions if you like):
 
     </dependencies>
     
+OK that was fun.  Obviously using Maven tricks you can bundle all this
+up in various ways (one of which [I blog about
+here](https://lairdnelson.wordpress.com/2018/12/21/maven-specifications-and-environments-part-0/)).
+
+On to the actual development.
+
+The support I've added to Helidon MicroProfile looks as much like Java
+EE as possible, while using CDI and only CDI as the backplane.
+
+So step one is to write a JAX-RS application.
+
+To do this portably, you'll need a root resource class and an
+`Application` to state authoritatively that it owns it.
+
+The root resource class might be named `HelloWorldResource` and might
+look like this to start (note that example code is subject to this
+project's license unless it explicitly says otherwise):
+
+```
+package io.github.ljnelson.helidon.mp.jpa;
+
+import java.util.Objects;
+import javax.enterprise.context.RequestScoped;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
+import javax.persistence.PersistenceException; // for javadoc only
+import javax.persistence.SynchronizationType;
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("")
+@RequestScoped
+public class HelloWorldResource {
+
+  @PersistenceContext(unitName = "test")
+  private EntityManager entityManager;
+
+  public HelloWorldResource() {
+    super();
+  }
+
+  @GET
+  @Path("{firstPart}")
+  @Produces(MediaType.TEXT_PLAIN)
+  public String get(@PathParam("firstPart") final String firstPart) {
+    return "world";
+  }
+
+}
+```
+
+Here we're not using it yet, but you can see that we've asked for an
+`EntityManager` to be handed to us (note the `@PersistenceContext`
+annotation).
+
+This `EntityManager` will behave exactly as an `EntityManager` would
+in a fat application server, i.e. _not_ like an EntityManager you
+create by hand.  Specifically, if there is a transaction in effect, it
+will automatically join it and do all the other Java EE-like things
+you're probably used to if you've programmed Java EE JPA stuff in the
+past.
+
+The `Application` might look like this:
+
+```
+package io.github.ljnelson.helidon.mp.jpa;
+
+import java.util.Collections;
+import java.util.Set;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import javax.ws.rs.core.Application;
+
+@ApplicationScoped
+public class GreetingApplication extends Application {
+
+  public GreetingApplication() {
+    super();
+  }
+
+  @Override
+  public Set<Class<?>> getClasses() {
+    return Collections.singleton(HelloWorldResource.class);
+  }
+  
+}
+```
+
+Let's beef up the `get()` method in our root resource class.  Let's
+change it to use the `EntityManager`:
+
+```
+  @GET
+  @Path("{firstPart}")
+  @Produces(MediaType.TEXT_PLAIN)
+  public String get(@PathParam("firstPart") final String firstPart) {
+    Objects.requireNonNull(firstPart);
+    assert this.entityManager != null;
+    final TypedQuery<Greeting> query = this.entityManager.createNamedQuery("findByFirstPart", Greeting.class);
+    query.setParameter("firstPart", firstPart);
+    return query.getSingleResult().toString();
+  }
+```
+
+Note in particular there's no starting of transactions or other
+boilerplate; that's all handled for you.  In this case, no transaction
+is in effect.
+
+Obviously for that bit of code to work we'll need an entity called
+`Greeting`, which might look like this:
+
+```
+package io.github.ljnelson.helidon.mp.jpa;
+
+import java.util.Objects;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+@Access(AccessType.FIELD)
+@Entity(name = "Greeting")
+@NamedQuery(name = "findByFirstPart",
+            query = "SELECT g FROM Greeting g WHERE g.firstPart = :firstPart")
+@Table(name = "GREETING",
+       uniqueConstraints = {
+         @UniqueConstraint(columnNames = {
+             "FIRSTPART", "SECONDPART"
+           },
+           name = "UNQ_GREETING"
+         )
+       })
+public class Greeting {
+
+  @Id
+  @Column(name = "ID", insertable = true, nullable = false, updatable = false)
+  @GeneratedValue
+  private Long id;
+
+  @Basic(optional = false)
+  @Column(name = "FIRSTPART", insertable = true, nullable = false, updatable = true)
+  private String firstPart;
+
+  @Basic(optional = false)
+  @Column(name = "SECONDPART", insertable = true, nullable = false, updatable = true)
+  private String secondPart;
+
+  /**
+   * Creates a new {@link Greeting}; required by the JPA specification
+   * and for no other purpose.
+   *
+   * @deprecated Please use the {@link #Greeting(Long, String,
+   * String)} constructor instead.
+   *
+   * @see #Greeting(Long, String, String)
+   */
+  @Deprecated
+  protected Greeting() {
+    super();
+  }
+
+  /**
+   * Creates a new {@link Greeting}.
+   *
+   * @param id the identifier; may be {@code null}
+   *
+   * @param firstPart the first part of the greeting; must not be
+   * {@code null}
+   *
+   * @param secondPart the second part of the greeting; must not be
+   * {@code null}
+   *
+   * @exception NullPointerException if {@code firstPart} or {@code
+   * secondPart} is {@code null}
+   */
+  public Greeting(final Long id, final String firstPart, final String secondPart) {
+    super();
+    this.id = id;
+    this.firstPart = Objects.requireNonNull(firstPart);
+    this.secondPart = Objects.requireNonNull(secondPart);
+  }
+
+  /**
+   * Returns the identifier of this {@link Greeting}.
+   *
+   * <p>This method may return {@code null}.</p>
+   *
+   * @return the identifier of this {@link Greeting} or {@code null}
+   */
+  public Long getId() {
+    return this.id;
+  }
+
+  /**
+   * Returns a {@link String} representation of the second part of
+   * this {@link Greeting}.
+   *
+   * <p>This method never returns {@code null}.</p>
+   *
+   * @return a non-{@code null} {@link String} representation of the
+   * second part of this {@link Greeting}
+   */
+  @Override
+  public String toString() {
+    return this.secondPart;
+  }
+  
+}
+```
+
 TODO: more

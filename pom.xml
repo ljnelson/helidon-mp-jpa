@@ -44,7 +44,7 @@
       <dependency>
         <groupId>io.helidon</groupId>
         <artifactId>helidon-bom</artifactId>
-        <version>0.11.0</version>
+        <version>0.11.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -70,7 +70,7 @@
       <dependency>
         <groupId>io.helidon.integrations.cdi</groupId>
         <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-        <version>0.11.1-SNAPSHOT</version> <!-- with https://github.com/oracle/helidon/pull/366 -->
+        <version>0.11.1</version>
         <type>jar</type>
       </dependency>
       

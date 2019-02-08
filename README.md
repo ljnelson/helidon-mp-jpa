@@ -13,7 +13,7 @@ You'll need to import the Helidon BOM, so in your
     <dependency>
       <groupId>io.helidon</groupId>
       <artifactId>helidon-bom</artifactId>
-      <version>0.11.0</version>
+      <version>0.11.1</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -26,7 +26,7 @@ Helidon MicroProfile, obviously:
       <artifactId>helidon-microprofile-1.2</artifactId>
     </dependency>
 
-(That will get its version from the BOM, which is `0.11.0` as you can
+(That will get its version from the BOM, which is `0.11.1` as you can
 see.)
 
 Now you'll also need `provided`-scoped dependencies on the two APIs
@@ -135,12 +135,9 @@ we'll need is a connection pool, so let's use Helidon's.  In
     <dependency>
       <groupId>io.helidon.integrations.cdi</groupId>
       <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-      <version>0.11.1-SNAPSHOT</version> <!-- with https://github.com/oracle/helidon/pull/366 -->
+      <version>0.11.1</version>
       <type>jar</type>
     </dependency>
-
-At the moment you'll have to build Helidon yourself with the mentioned
-pull request; once 1.0 is out you can use that directly.
 
 Then in `<dependencies>` you'll have:
 
@@ -306,7 +303,7 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>io.helidon</groupId>
           <artifactId>helidon-bom</artifactId>
-          <version>0.11.0</version>
+          <version>0.11.1</version>
           <type>pom</type>
           <scope>import</scope>
         </dependency>
@@ -332,7 +329,7 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>io.helidon.integrations.cdi</groupId>
           <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-          <version>0.11.1-SNAPSHOT</version> <!-- with https://github.com/oracle/helidon/pull/366 -->
+          <version>0.11.1</version>
           <type>jar</type>
         </dependency>
 

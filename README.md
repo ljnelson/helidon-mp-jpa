@@ -1,6 +1,7 @@
 # Helidon MicroProfile with JPA
 
-Here's how to do this yourself.
+Here's how to do this yourself.  This is using Maven 3.5.0 or later.
+I presume that you're not a Maven or Java novice.
 
 First, let's look at the `pom.xml`.
 
@@ -8,11 +9,11 @@ You'll need to import the Helidon BOM, so in your
 `<dependencyManagement>` stanza you'll need:
 
     <dependency>
-        <groupId>io.helidon</groupId>
-        <artifactId>helidon-bom</artifactId>
-        <version>0.11.0</version>
-        <type>pom</type>
-        <scope>import</scope>
+      <groupId>io.helidon</groupId>
+      <artifactId>helidon-bom</artifactId>
+      <version>0.11.0</version>
+      <type>pom</type>
+      <scope>import</scope>
     </dependency>
 
 Then, in your actual `<dependencies>` section, you'll need to bring in
@@ -30,19 +31,19 @@ Now you'll also need `provided`-scoped dependencies on the two APIs
 you'll be working with directly.  I like to specify versions in my
 `<dependencyManagement>` section, like this:
 
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>javax.persistence-api</artifactId>
-        <version>2.2</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <version>2.2</version>
+      <type>jar</type>
+    </dependency>
 
-      <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>javax.transaction-api</artifactId>
-        <version>1.2</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
+      <version>1.2</version>
+      <type>jar</type>
+    </dependency>
       
 ...and then in my `<dependencies>` stanza simply "point" to them, like so:
 
@@ -65,17 +66,17 @@ For the JTA stuff, you'll want to have this in
 `<dependencyManagement>`:
 
     <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-narayana-jta-cdi</artifactId>
-        <version>0.1.6</version>
-        <type>jar</type>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-narayana-jta-cdi</artifactId>
+      <version>0.1.6</version>
+      <type>jar</type>
     </dependency>
 
     <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <version>0.1.4</version>
-        <type>jar</type>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-narayana-jta-weld-se</artifactId>
+      <version>0.1.4</version>
+      <type>jar</type>
     </dependency>
 
 ...and then you'll want to "point at" it in `<dependencies>`:
@@ -109,10 +110,10 @@ methods](http://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#transactional_observer
 So in `<dependencyManagement>` you'll have:
 
     <dependency>
-        <groupId>org.jboss.weld.module</groupId>
-        <artifactId>weld-jta</artifactId>
-        <version>3.0.3.Final</version>
-        <type>jar</type>
+      <groupId>org.jboss.weld.module</groupId>
+      <artifactId>weld-jta</artifactId>
+      <version>3.0.3.Final</version>
+      <type>jar</type>
     </dependency>
 
 ...and in `<dependencies>` you'll have:
@@ -130,10 +131,10 @@ we'll need is a connection pool, so let's use Helidon's.  In
 `<dependencyManagement>` you should do this:
 
     <dependency>
-        <groupId>io.helidon.integrations.cdi</groupId>
-        <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-        <version>0.11.1-SNAPSHOT</version> <!-- with https://github.com/oracle/helidon/pull/366 -->
-        <type>jar</type>
+      <groupId>io.helidon.integrations.cdi</groupId>
+      <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
+      <version>0.11.1-SNAPSHOT</version> <!-- with https://github.com/oracle/helidon/pull/366 -->
+      <type>jar</type>
     </dependency>
 
 At the moment you'll have to build Helidon yourself with the mentioned
@@ -142,10 +143,10 @@ pull request; once 1.0 is out you can use that directly.
 Then in `<dependencies>` you'll have:
 
     <dependency>
-        <groupId>io.helidon.integrations.cdi</groupId>
-        <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-        <scope>runtime</scope>
-        <optional>true</optional>
+      <groupId>io.helidon.integrations.cdi</groupId>
+      <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     
 Once again, it's `runtime` and `optional` to indicate that you can
@@ -156,12 +157,12 @@ i.e. so long as other components can look up a `DataSource` with
 Next, we'll need a JPA implementation.  Here's Eclipselink in
 `<dependencyManagement>`:
 
-      <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <version>2.7.3</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.jpa</artifactId>
+      <version>2.7.3</version>
+      <type>jar</type>
+    </dependency>
       
 ...and in `<dependencies>`:
 

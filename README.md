@@ -532,7 +532,38 @@ On to the actual development.
 The support I've added to Helidon MicroProfile looks as much like Java
 EE as possible, while using CDI and only CDI as the backplane.
 
-So step one is to write a JAX-RS application.
+Since we're using CDI, create a
+`src/main/resources/META-INF/beans.xml` file and make it look like
+this:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                           http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd"
+       version="2.0"
+       bean-discovery-mode="annotated">
+</beans>
+```
+
+Also right now before you forget create
+`src/test/resources/META-INF/beans.xml` and make it look identical:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                           http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd"
+       version="2.0"
+       bean-discovery-mode="annotated">
+</beans>
+```
+
+OK, we're set up for CDI success.
+
+So step one in actual development is to write a JAX-RS application.
 
 To do this portably, you'll need a root resource class and an
 `Application` to state authoritatively that it owns it.
@@ -814,10 +845,11 @@ that's what our `DataSource` was named as well.  That's on purpose.
 
 This persistence unit uses Eclipselink as the provider.
 
-There are [various Eclipselink-specific properties]() here, most of
-which just make things nicer.  One that is definitely not optional in
-this case is the `eclipselink.target-server` property, which **must
-bet set to a value of
+There are [various Eclipselink-specific
+properties](https://www.eclipse.org/eclipselink/documentation/2.7/jpa/extensions/persistenceproperties_ref.htm)
+here, most of which just make things nicer.  One that is definitely
+not optional in this case is the `eclipselink.target-server` property,
+which **must bet set to a value of
 [`org.microbean.eclipselink.cdi.CDISEPlatform`](https://github.com/microbean/microbean-eclipselink-cdi/blob/bd8c8c765a3e436d6d8d9c7f79d1d1405752cf64/src/main/java/org/microbean/eclipselink/cdi/CDISEPlatform.java#L36-L223)**.
 This allows Eclipselink to think that it's running in a Java EE server
 on occasion but helpfully tells it to stop trying to use JNDI.
@@ -835,4 +867,62 @@ So now we have:
 * Configuration that sets up the database and links it to the
   persistence unit
 
-TODO: more
+We can add a JUnit test that tries to drive all this.  It might look like this:
+
+```
+package io.github.ljnelson.helidon.mp.jpa;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.enterprise.inject.se.SeContainer;
+import javax.enterprise.inject.spi.CDI;
+
+import io.helidon.microprofile.server.Server;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class TestJPAIntegration {
+
+  private Server server;
+
+  private URL baseUrl;
+  
+  public TestJPAIntegration() {
+    super();
+  }
+
+  @Before
+  public void startServer() throws MalformedURLException {
+    this.server = Server.create().start();
+    this.baseUrl = new URL("http://127.0.0.1:" + server.port());
+  }
+
+  @After
+  public void stopServer() {
+    this.server.stop();
+    this.baseUrl = null;
+  }
+
+  @Test
+  public void testGet() throws Exception {
+    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(this.baseUrl, "/hello").openStream(), "UTF-8"))) {
+      assertEquals("world", reader.readLine());
+    }
+  }
+  
+}
+```

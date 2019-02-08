@@ -3,6 +3,8 @@
 Here's how to do this yourself.  This is using Maven 3.5.0 or later.
 I presume that you're not a Maven or Java novice.
 
+## `pom.xml` Setup
+
 First, let's look at the `pom.xml`.
 
 You'll need to import the Helidon BOM, so in your
@@ -528,6 +530,8 @@ OK that was fun.  Obviously using Maven tricks you can bundle all this
 up in various ways (one of which [I blog about
 here](https://lairdnelson.wordpress.com/2018/12/21/maven-specifications-and-environments-part-0/)).
 
+## Development Setup
+
 On to the actual development.
 
 The support I've added to Helidon MicroProfile looks as much like Java
@@ -563,6 +567,8 @@ Also right now before you forget create
 ```
 
 OK, we're set up for CDI success.
+
+### Writing the JAX-RS Application
 
 So step one in actual development is to write a JAX-RS application.
 
@@ -784,6 +790,8 @@ public class Greeting {
 OK, so that's all the code you need for a fetch-type operation.  Now
 let's set up the test database and the connection pool.
 
+### Setting Up the Database and Connection Pool
+
 The connection pool creates itself from configuration properties, and
 the kinds of configuration properties in play when you're talking
 about Helidon MicroProfile are MicroProfile Config configuration
@@ -810,6 +818,8 @@ H2 feature of being able to run some initialization SQL on
 startup](http://www.h2database.com/html/features.html#execute_sql_on_connection).
 The user is the default `sa` user, and the password is the empty
 string.
+
+### Setting Up JPA
 
 Next, we'll need to tell JPA what we're up to.  Create
 `src/test/resources/META-INF/persistence.xml` and make it look like
@@ -870,6 +880,8 @@ So now we have:
 * Various runtime components that stitch it all together
 * Configuration that sets up the database and links it to the
   persistence unit
+
+### Testing
 
 We can add a JUnit test that tries to drive all this.  It might look like this:
 
@@ -1006,6 +1018,8 @@ our REST endpoint.  If you run `mvn test` at this point, everything
 should still pass, and if you could see what was going on you'd see
 SQL going into the database.
 
+#### Logging
+
 To see what's going on, it might help to set up Java logging
 appropriately.  Let's create `src/test/logging.properties` and make it
 look like this:
@@ -1123,3 +1137,24 @@ INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test
 ```
 
 Yay!
+
+## Related Projects
+
+These are my skunkworks projects:
+* [microbean-eclipselink-cdi](https://microbean.github.io/microbean-eclipselink-cdi/index.html):
+  Provides an Eclipselink platform that uses CDI instead of JNDI for
+  transaction resolution.
+* [microbean-hibernate-cdi](https://microbean.github.io/microbean-hibernate-cdi/index.html):
+  Provides a Hibernate platform that uses CDI instead of JNDI for
+  transaction resolution.
+* [microbean-jpa-cdi](https://microbean.github.io/microbean-jpa-cdi/index.html):
+  Provides JPA-independent CDI glue.
+* [microbean-jpa-weld-se](https://microbean.github.io/microbean-jpa-weld-se/index.html):
+  Provides injection of `@PersistenceUnit` and `@PersistenceContext`
+  injection points in as native a way as possible for Weld-based CDI implementations.
+* [microbean-narayana-jta-cdi](https://microbean.github.io/microbean-narayana-jta-cdi/index.html):
+  Provides the CDI-implementation-independent bits required to get JTA
+  running in CDI SE.
+* [microbean-narayana-jta-weld-se](https://microbean.github.io/microbean-narayana-jta-weld-se/index.html):
+  Provides transactional observer support for Weld-based CDI
+  implementations.

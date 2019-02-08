@@ -950,10 +950,12 @@ Now let's go back to the root resource class and add a stupid `POST` method:
   }
 ```
 
-Note the `@Transactional(TxType.REQUIRED)` annotation.
+Note the
+`[@Transactional](https://javaee.github.io/javaee-spec/javadocs/javax/transaction/Transactional.html)(TxType.REQUIRED)`
+annotation.
 
 Normally putting this kind of logic directly on a JAX-RS class would
-be quite rightly frowned upon but we're in Happy Example Land&tm; so
+be quite rightly frowned upon but we're in Happy Example Land™ so
 we get to do things like this.
 
 This annotation replaces what EJBs used to do for us.  Now we can mark

@@ -90,7 +90,6 @@ For the JTA stuff, you'll want to have this in
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-narayana-jta-cdi</artifactId>
-      <type>jar</type>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
@@ -177,12 +176,12 @@ running in a giant snarling Java EE server, but neither, exactly, is
 it going to be running in true SE mode.  So put this in your
 `<dependencyManagement>` stanza:
 
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-eclipselink-cdi</artifactId>
-        <version>0.0.1</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-eclipselink-cdi</artifactId>
+      <version>0.0.1</version>
+      <type>jar</type>
+    </dependency>
       
 ...and this in your `<dependencies>` stanza:
 
@@ -195,22 +194,40 @@ it going to be running in true SE mode.  So put this in your
     
 Another `runtime` `optional` component.
 
+A database for testing would be handy, so put this in your `<dependencyManagement>` stanza:
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.197</version>
+      <type>jar</type>
+    </dependency>
+
+...and this in your `<dependencies>` stanza:
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+
 Now we need the CDI glue to stitch this together.  Put this in your
 `<dependencyManagement>` stanza:
 
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-jpa-cdi</artifactId>
-        <version>0.1.9</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-jpa-cdi</artifactId>
+      <version>0.1.9</version>
+      <type>jar</type>
+    </dependency>
       
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-jpa-weld-se</artifactId>
-        <version>0.3.0</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-jpa-weld-se</artifactId>
+      <version>0.3.0</version>
+      <type>jar</type>
+    </dependency>
       
 ...and this in your `<dependencies>` stanza:
 
@@ -236,12 +253,12 @@ Then there are some goodies that really are optional.  Woodstox will
 make XML parsing much faster, so it's nice to put this in your
 `<dependencyManagement>` stanza:
 
-      <dependency>
-        <groupId>com.fasterxml.woodstox</groupId>
-        <artifactId>woodstox-core</artifactId>
-        <version>5.2.0</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+      <version>5.2.0</version>
+      <type>jar</type>
+    </dependency>
       
 ...and this in your `<dependencies>` stanza:
 
@@ -255,12 +272,12 @@ make XML parsing much faster, so it's nice to put this in your
 Jandex will make annotation scanning super fast so do this in your
 `<dependencyManagement>` stanza:
 
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jandex</artifactId>
-        <version>2.0.5.Final</version>
-        <type>jar</type>
-      </dependency>
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jandex</artifactId>
+      <version>2.0.5.Final</version>
+      <type>jar</type>
+    </dependency>
       
 ...and this in your `<dependencies>` stanza:
 
@@ -394,14 +411,12 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
@@ -472,7 +487,6 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-cdi</artifactId>
-        <type>jar</type>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
@@ -484,7 +498,6 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>javax.persistence</groupId>
         <artifactId>javax.persistence-api</artifactId>
-        <type>jar</type>
         <scope>provided</scope>
       </dependency>
 

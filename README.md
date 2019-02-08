@@ -996,6 +996,124 @@ We can update our test to test this behavior too:
 ```
 
 That is some convoluted JDK gymnastics that sends a `POST` request to
-our REST endpoint.
+our REST endpoint.  If you run `mvn test` at this point, everything
+should still pass, and if you could see what was going on you'd see
+SQL going into the database.
 
-TODO: more
+To see what's going on, it might help to set up Java logging
+appropriately.  Let's create `src/test/logging.properties` and make it
+look like this:
+
+```
+.level=WARNING
+org.eclipse.persistence.level=FINE
+handlers=java.util.logging.ConsoleHandler
+java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
+java.util.logging.ConsoleHandler.level=FINEST
+```
+
+Then let's tell Maven's Surefire, the testing plugin, to make sure
+it's passed when it forks off a JVM to run our test.  In your
+`<plugins>` stanza you'll want something like this:
+
+    <plugin>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <configuration>
+        <systemPropertyVariables>
+          <java.util.logging.config.file>${basedir}/src/test/logging.properties</java.util.logging.config.file>
+        </systemPropertyVariables>
+      </configuration>
+    </plugin>
+
+Now when you run `mvn test` you should see output kind of like this:
+```
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.github.ljnelson.helidon.mp.jpa.TestJPAIntegration
+Feb 07, 2019 5:14:34 PM org.jboss.weld.bootstrap.events.BeforeBeanDiscoveryImpl addAnnotatedType
+WARN: WELD-000146: BeforeBeanDiscovery.addAnnotatedType(AnnotatedType<?>) used for class org.glassfish.jersey.ext.cdi1x.internal.CdiComponentProvider$JaxRsParamProducer is deprecated from CDI 1.1!
+Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.server
+FINE: Configured server platform: org.microbean.eclipselink.cdi.CDISEPlatform
+Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test
+INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.3.v20180807-4be1041
+Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: connecting(DatabaseLogin(
+	platform=>H2Platform
+	user name=> ""
+	connector=>JNDIConnector datasource name=>null
+))
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: Connected: jdbc:h2:mem:test
+	User: SA
+	Database: H2  Version: 1.4.197 (2018-03-18)
+	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: connecting(DatabaseLogin(
+	platform=>H2Platform
+	user name=> ""
+	connector=>JNDIConnector datasource name=>null
+))
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: Connected: jdbc:h2:mem:test
+	User: SA
+	Database: H2  Version: 1.4.197 (2018-03-18)
+	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test login successful
+Feb 07, 2019 5:14:38 PM com.arjuna.common.util.propertyservice.AbstractPropertiesFactory getPropertiesFromFile
+WARN: ARJUNA048002: Could not find configuration file, URL was: null
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+FINE: SELECT ID, FIRSTPART, SECONDPART FROM GREETING WHERE (FIRSTPART = ?)
+	bind => [1 parameter bound]
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: disconnect
+Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test logout successful
+Feb 07, 2019 5:14:39 PM org.jboss.weld.bootstrap.events.BeforeBeanDiscoveryImpl addAnnotatedType
+WARN: WELD-000146: BeforeBeanDiscovery.addAnnotatedType(AnnotatedType<?>) used for class org.glassfish.jersey.ext.cdi1x.internal.CdiComponentProvider$JaxRsParamProducer is deprecated from CDI 1.1!
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.server
+FINE: Configured server platform: org.microbean.eclipselink.cdi.CDISEPlatform
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test
+INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.3.v20180807-4be1041
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: connecting(DatabaseLogin(
+	platform=>H2Platform
+	user name=> ""
+	connector=>JNDIConnector datasource name=>null
+))
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: Connected: jdbc:h2:mem:test
+	User: SA
+	Database: H2  Version: 1.4.197 (2018-03-18)
+	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: connecting(DatabaseLogin(
+	platform=>H2Platform
+	user name=> ""
+	connector=>JNDIConnector datasource name=>null
+))
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: Connected: jdbc:h2:mem:test
+	User: SA
+	Database: H2  Version: 1.4.197 (2018-03-18)
+	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
+Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test login successful
+Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+FINE: UPDATE SEQUENCE SET SEQ_COUNT = SEQ_COUNT + ? WHERE SEQ_NAME = ?
+	bind => [2 parameters bound]
+Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+FINE: SELECT SEQ_COUNT FROM SEQUENCE WHERE SEQ_NAME = ?
+	bind => [1 parameter bound]
+Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+FINE: INSERT INTO GREETING (ID, FIRSTPART, SECONDPART) VALUES (?, ?, ?)
+	bind => [3 parameters bound]
+Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+CONFIG: disconnect
+Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test logout successful
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.538 s - in io.github.ljnelson.helidon.mp.jpa.TestJPAIntegration
+```
+
+Yay!

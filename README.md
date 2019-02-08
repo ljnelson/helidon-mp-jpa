@@ -926,3 +926,76 @@ public class TestJPAIntegration {
   
 }
 ```
+
+If you run `mvn test` at this point (I haven't tried it, but you'll
+note an uncanny resemblance between this README and this actual
+project, which works!), you should see the test pass.
+
+Now let's go back to the root resource class and add a stupid `POST` method:
+
+```
+  @POST
+  @Path("{firstPart}")
+  @Consumes(MediaType.TEXT_PLAIN)
+  @Produces(MediaType.TEXT_PLAIN)
+  @Transactional(TxType.REQUIRED)
+  public String post(@PathParam("firstPart") final String firstPart,
+                     final String secondPart) {
+    Objects.requireNonNull(firstPart);
+    Objects.requireNonNull(secondPart);
+    assert this.entityManager != null;
+    Greeting greeting = new Greeting(null, firstPart, secondPart);
+    greeting = this.entityManager.merge(greeting);
+    return String.valueOf(greeting.getId());
+  }
+```
+
+Note the `@Transactional(TxType.REQUIRED)` annotation.
+
+Normally putting this kind of logic directly on a JAX-RS class would
+be quite rightly frowned upon but we're in Happy Example Land&tm; so
+we get to do things like this.
+
+This annotation replaces what EJBs used to do for us.  Now we can mark
+methods as requiring EJB transaction semantics, only without all the
+other EJB stuff no one actually cared about.  Here, we're saying:
+"Please start a JTA transaction encompassing this method".
+
+Remember our friend the `EntityManager`?  That `EntityManager` will
+automatically take part in that transaction, just as if you were in a
+big, fat Java EE application server.  Only you're not.
+
+We can update our test to test this behavior too:
+
+```
+  @Test
+  public void testPost() throws Exception {
+    final HttpURLConnection c = (HttpURLConnection)new URL(this.baseUrl, "/hello").openConnection();
+    assertNotNull(c);
+    c.setDoOutput(true);
+    c.setRequestProperty("Content-Type", "text/plain");
+    c.setRequestMethod("POST");
+    final byte[] helloBytes = "hello".getBytes("UTF8");
+    assertNotNull(helloBytes);
+    c.setRequestProperty("Content-Length", String.valueOf(helloBytes.length));
+    try(final OutputStream stream = new BufferedOutputStream(c.getOutputStream())) {
+      assertNotNull(stream);
+      stream.write(helloBytes, 0, helloBytes.length);
+    }
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (final InputStream inputStream = new BufferedInputStream(c.getInputStream())) {
+      assertNotNull(inputStream);
+      int bytesRead;      
+      final byte[] bytes = new byte[4096];
+      while ((bytesRead = inputStream.read(bytes, 0, bytes.length)) != -1) {
+        baos.write(bytes, 0, bytesRead);
+      }
+    }
+    assertEquals("1", baos.toString("UTF8"));
+  }
+```
+
+That is some convoluted JDK gymnastics that sends a `POST` request to
+our REST endpoint.
+
+TODO: more

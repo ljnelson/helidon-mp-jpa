@@ -955,7 +955,7 @@ Now let's go back to the root resource class and add a stupid `POST` method:
 ```
 
 Note the
-`[@Transactional](https://javaee.github.io/javaee-spec/javadocs/javax/transaction/Transactional.html)(TxType.REQUIRED)`
+[`@Transactional`](https://javaee.github.io/javaee-spec/javadocs/javax/transaction/Transactional.html)`(TxType.REQUIRED)`
 annotation.
 
 Normally putting this kind of logic directly on a JAX-RS class would

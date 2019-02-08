@@ -153,7 +153,8 @@ pick any connection pool you wish so long as it has CDI support,
 i.e. so long as other components can look up a `DataSource` with
 `@Named` on it.
 
-Next, we'll need a JPA implementation.  Here's Eclipselink in `<dependencyManagement>`:
+Next, we'll need a JPA implementation.  Here's Eclipselink in
+`<dependencyManagement>`:
 
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
@@ -171,6 +172,9 @@ Next, we'll need a JPA implementation.  Here's Eclipselink in `<dependencyManage
       <optional>true</optional>
     </dependency>
     
+Note again that I've listed it as `optional` as nothing internally
+cares whether you're using Eclipselink or, say, Hibernate.
+
 We'll need a way to tell Eclipselink that it is not going to be
 running in a giant snarling Java EE server, but neither, exactly, is
 it going to be running in true SE mode.  So put this in your

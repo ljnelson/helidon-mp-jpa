@@ -749,4 +749,90 @@ public class Greeting {
 }
 ```
 
+OK, so that's all the code you need for a fetch-type operation.  Now
+let's set up the test database and the connection pool.
+
+The connection pool creates itself from configuration properties, and
+the kinds of configuration properties in play when you're talking
+about Helidon MicroProfile are MicroProfile Config configuration
+properties, so to get started let's add them to the default place
+where such properties live.  MicroProfile Config is very flexible so
+there are a zillion other places you could put them, but this is easy.
+Create `src/test/resources/META-INF/microprofile-config.properties`
+and make it look like this:
+
+```
+javax.sql.DataSource.test.dataSourceClassName=org.h2.jdbcx.JdbcDataSource
+javax.sql.DataSource.test.dataSource.url=jdbc:h2:mem:test;INIT=CREATE TABLE GREETING (ID BIGINT NOT NULL, FIRSTPART VARCHAR NOT NULL, SECONDPART VARCHAR NOT NULL, PRIMARY KEY (ID))\\;ALTER TABLE GREETING ADD CONSTRAINT UNQ_GREETING UNIQUE (FIRSTPART, SECONDPART)\\;CREATE TABLE SEQUENCE (SEQ_NAME VARCHAR(50) NOT NULL, SEQ_COUNT NUMERIC(38), PRIMARY KEY (SEQ_NAME))\\;INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) VALUES ('SEQ_GEN', 0)\\;INSERT INTO GREETING (ID, FIRSTPART, SECONDPART) VALUES (-1, 'hello', 'world')
+javax.sql.DataSource.test.username=sa
+javax.sql.DataSource.test.password=
+```
+
+Anything starting with `javax.sql.DataSource.` is a piece of
+information destined for the guts of the Helidon MicroProfile
+connection pool, which is [documented over
+here](https://github.com/oracle/helidon/blob/master/integrations/cdi/datasource-hikaricp/README.adoc).
+Here you can see that we're setting up the `DataSource` to be backed
+by an in-memory H2 database named `test`.  It's using the [convenient
+H2 feature of being able to run some initialization SQL on
+startup](http://www.h2database.com/html/features.html#execute_sql_on_connection).
+The user is the default `sa` user, and the password is the empty
+string.
+
+Next, we'll need to tell JPA what we're up to.  Create
+`src/test/resources/META-INF/persistence.xml` and make it look like
+this:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+                                 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+  <persistence-unit
+      name="test"
+      transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>io.github.ljnelson.helidon.mp.jpa.Greeting</class>
+    <properties>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.ddl-generation.output-mode" value="sql-script"/>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="createDDL_ddlGeneration.jdbc"/>
+      <property name="eclipselink.deploy-on-startup" value="true"/>
+      <property name="eclipselink.jdbc.native-sql" value="true"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+      <property name="eclipselink.target-server" value="org.microbean.eclipselink.cdi.CDISEPlatform"/>
+    </properties>
+  </persistence-unit>
+</persistence>
+```
+
+Here we've defined a persistence unit named `test`.  You'll note
+that's what our `DataSource` was named as well.  That's on purpose.
+
+This persistence unit uses Eclipselink as the provider.
+
+There are [various Eclipselink-specific properties]() here, most of
+which just make things nicer.  One that is definitely not optional in
+this case is the `eclipselink.target-server` property, which **must
+bet set to a value of
+[`org.microbean.eclipselink.cdi.CDISEPlatform`](https://github.com/microbean/microbean-eclipselink-cdi/blob/bd8c8c765a3e436d6d8d9c7f79d1d1405752cf64/src/main/java/org/microbean/eclipselink/cdi/CDISEPlatform.java#L36-L223)**.
+This allows Eclipselink to think that it's running in a Java EE server
+on occasion but helpfully tells it to stop trying to use JNDI.
+(There's an analogous [Hibernate
+construct](https://github.com/microbean/microbean-hibernate-cdi/tree/master/src/main/java/org/microbean/hibernate/cdi)
+too.)
+
+So now we have:
+* A JAX-RS application
+* A JAX-RS implementation (Helidon MicroProfile)
+* A connection pool (Helidon's HikariCP integration)
+* A JPA implementation (EclipseLink)
+* A transaction manager (Narayana)
+* Various runtime components that stitch it all together
+* Configuration that sets up the database and links it to the
+  persistence unit
+
 TODO: more

@@ -126,21 +126,14 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-weld-se</artifactId>
-        <version>0.3.0</version>
-        <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-narayana-jta-cdi</artifactId>
-        <version>0.1.6</version>
+        <version>0.4.0</version>
         <type>jar</type>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <version>0.1.4</version>
+        <version>0.2.2</version>
         <type>jar</type>
       </dependency>
 
@@ -227,14 +220,6 @@
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-narayana-jta-weld-se</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-narayana-jta-cdi</artifactId>
-      <type>jar</type>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>

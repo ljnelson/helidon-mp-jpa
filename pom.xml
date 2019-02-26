@@ -44,7 +44,7 @@
       <dependency>
         <groupId>io.helidon</groupId>
         <artifactId>helidon-bom</artifactId>
-        <version>0.11.1</version>
+        <version>1.0.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -70,7 +70,7 @@
       <dependency>
         <groupId>io.helidon.integrations.cdi</groupId>
         <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-        <version>0.11.1</version>
+        <version>1.0.0</version>
         <type>jar</type>
       </dependency>
       
@@ -112,14 +112,14 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-eclipselink-cdi</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-cdi</artifactId>
-        <version>0.1.9</version>
+        <version>0.1.10</version>
         <type>jar</type>
       </dependency>
       
@@ -133,7 +133,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <version>0.2.2</version>
+        <version>0.2.3</version>
         <type>jar</type>
       </dependency>
 

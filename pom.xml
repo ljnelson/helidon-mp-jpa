@@ -40,6 +40,7 @@
 
 
       <!-- Imports. -->
+      
 
       <dependency>
         <groupId>io.helidon</groupId>
@@ -112,21 +113,21 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-eclipselink-cdi</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0</version>
         <type>jar</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-cdi</artifactId>
-        <version>0.1.10</version>
+        <version>0.2.0</version>
         <type>jar</type>
       </dependency>
       
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-weld-se</artifactId>
-        <version>0.4.0</version>
+        <version>0.4.1</version>
         <type>jar</type>
       </dependency>
 
@@ -261,6 +262,28 @@
       <plugins>
 
         <plugin>
+          <groupId>com.ethlo.persistence.tools</groupId>
+          <artifactId>eclipselink-maven-plugin</artifactId>
+          <version>2.7.1.1</version>
+          <executions>
+            <execution>
+              <id>weave</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>weave</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>modelgen</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>modelgen</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.1.1</version>
         </plugin>
@@ -295,6 +318,11 @@
     </pluginManagement>
     
     <plugins>
+
+      <plugin>
+        <groupId>com.ethlo.persistence.tools</groupId>
+        <artifactId>eclipselink-maven-plugin</artifactId>
+      </plugin>
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>

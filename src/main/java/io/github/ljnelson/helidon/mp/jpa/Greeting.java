@@ -17,6 +17,7 @@
 package io.github.ljnelson.helidon.mp.jpa;
 
 import java.util.Objects;
+import javax.enterprise.context.Dependent;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;

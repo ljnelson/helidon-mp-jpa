@@ -21,14 +21,12 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.enterprise.inject.se.SeContainer;
-import javax.enterprise.inject.spi.CDI;
 
 import io.helidon.microprofile.server.Server;
 

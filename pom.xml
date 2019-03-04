@@ -205,14 +205,6 @@
       <optional>true</optional>
     </dependency>
 
-    <!--
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-jpa-cdi</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    -->
-
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-jpa-weld-se</artifactId>

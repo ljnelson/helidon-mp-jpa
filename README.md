@@ -378,14 +378,14 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-jpa-cdi</artifactId>
-          <version>0.2.0</version>
+          <version>0.2.1</version>
           <type>jar</type>
         </dependency>
 
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-jpa-weld-se</artifactId>
-          <version>0.4.1</version>
+          <version>0.4.2</version>
           <type>jar</type>
         </dependency>
 

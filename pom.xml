@@ -134,7 +134,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <version>0.2.3</version>
+        <version>0.2.4</version>
         <type>jar</type>
       </dependency>
 
@@ -204,12 +204,14 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
-    
+
+    <!--
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-jpa-cdi</artifactId>
       <scope>runtime</scope>
     </dependency>
+    -->
 
     <dependency>
       <groupId>org.microbean</groupId>

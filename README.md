@@ -303,7 +303,7 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>io.helidon</groupId>
           <artifactId>helidon-bom</artifactId>
-          <version>0.11.1</version>
+          <version>1.0.0</version>
           <type>pom</type>
           <scope>import</scope>
         </dependency>
@@ -329,7 +329,7 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>io.helidon.integrations.cdi</groupId>
           <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-          <version>0.11.1</version>
+          <version>1.0.0</version>
           <type>jar</type>
         </dependency>
 
@@ -371,35 +371,28 @@ this (obviously sanity-check the versions if you like):
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-eclipselink-cdi</artifactId>
-          <version>0.0.1</version>
+          <version>0.2.0</version>
           <type>jar</type>
         </dependency>
 
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-jpa-cdi</artifactId>
-          <version>0.1.9</version>
+          <version>0.2.0</version>
           <type>jar</type>
         </dependency>
 
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-jpa-weld-se</artifactId>
-          <version>0.3.0</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.microbean</groupId>
-          <artifactId>microbean-narayana-jta-cdi</artifactId>
-          <version>0.1.6</version>
+          <version>0.4.1</version>
           <type>jar</type>
         </dependency>
 
         <dependency>
           <groupId>org.microbean</groupId>
           <artifactId>microbean-narayana-jta-weld-se</artifactId>
-          <version>0.1.4</version>
+          <version>0.2.4</version>
           <type>jar</type>
         </dependency>
 

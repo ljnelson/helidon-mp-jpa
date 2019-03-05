@@ -16,8 +16,20 @@
       <property name="eclipselink.logging.logger" value="JavaLogger"/>
       <property name="eclipselink.logging.parameters" value="true"/>
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
+
       <property name="eclipselink.target-server" value="org.microbean.eclipselink.cdi.CDISEPlatform"/>
+      <!--
+          Hibernate doesn't need a property here; the presence of a
+          JTAPlatform CDI bean will be enough.
+      -->
+
       <property name="eclipselink.weaving" value="false"/>
+      <!--
+          Hibernate weaving is disabled by default so there is no
+          property to set here; see
+          https://github.com/hibernate/hibernate-orm/blob/5.3.7/documentation/src/main/asciidoc/userguide/chapters/pc/BytecodeEnhancement.adoc#runtime-enhancement
+      -->
+
     </properties>
   </persistence-unit>
 </persistence>

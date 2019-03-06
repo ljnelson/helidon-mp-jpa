@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.microbean</groupId>
     <artifactId>microbean-pluginmanagement-pom</artifactId>
-    <version>9</version>
+    <version>10</version>
     <relativePath/>
   </parent>
 
@@ -120,7 +120,7 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-jpa-cdi</artifactId>
-        <version>0.3.0</version>
+        <version>0.4.1</version>
         <type>jar</type>
       </dependency>
       
@@ -275,25 +275,6 @@
               </goals>
             </execution>
           </executions>
-        </plugin>
-        
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.1</version>
-        </plugin>
-        
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <additionalJOptions combine.children="append">
-              <additionalJOption>-J-Dhttp.agent=maven-javadoc-plugin</additionalJOption>
-            </additionalJOptions>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.0.0</version>
         </plugin>
         
         <plugin>

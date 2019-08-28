@@ -18,12 +18,16 @@ package io.github.ljnelson.helidon.mp.jpa;
 
 import java.util.Objects;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException; // for javadoc only
 import javax.persistence.SynchronizationType;
 import javax.persistence.TypedQuery;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 import javax.ws.rs.GET;
@@ -57,6 +61,15 @@ public class HelloWorldResource {
    */
   @PersistenceContext(unitName = "test", synchronization = SynchronizationType.SYNCHRONIZED, type = PersistenceContextType.TRANSACTION)
   private EntityManager entityManager;
+
+  /**
+   * A {@link Transaction} that is guaranteed to be non-{@code null}
+   * only when a transactional method is executing.
+   *
+   * @see #post(String, String)
+   */
+  @Inject
+  private Transaction transaction;
 
   /**
    * Creates a new {@link HelloWorldResource}.
@@ -115,6 +128,9 @@ public class HelloWorldResource {
    *
    * @exception PersistenceException if the {@link EntityManager} blew
    * up
+   *
+   * @exception SystemException if something went wrong with the
+   * transaction
    */
   @POST
   @Path("{firstPart}")
@@ -122,10 +138,14 @@ public class HelloWorldResource {
   @Produces(MediaType.TEXT_PLAIN)
   @Transactional(TxType.REQUIRED)
   public String post(@PathParam("firstPart") final String firstPart,
-                     final String secondPart) {
+                     final String secondPart)
+  throws SystemException {
     Objects.requireNonNull(firstPart);
     Objects.requireNonNull(secondPart);
+    assert this.transaction != null;
+    assert this.transaction.getStatus() == Status.STATUS_ACTIVE;
     assert this.entityManager != null;
+    assert this.entityManager.isJoinedToTransaction();
     Greeting greeting = new Greeting(null, firstPart, secondPart);
     greeting = this.entityManager.merge(greeting);
     return String.valueOf(greeting.getId());

@@ -17,7 +17,7 @@
       <property name="eclipselink.logging.parameters" value="true"/>
       <property name="eclipselink.target-database" value="org.eclipse.persistence.platform.database.H2Platform"/>
 
-      <property name="eclipselink.target-server" value="org.microbean.eclipselink.cdi.CDISEPlatform"/>
+      <property name="eclipselink.target-server" value="io.helidon.integrations.cdi.eclipselink.CDISEPlatform"/>
       <!--
           Hibernate doesn't need a property here; the presence of a
           JTAPlatform CDI bean will be enough.

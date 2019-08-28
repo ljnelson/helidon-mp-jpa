@@ -13,7 +13,7 @@ You'll need to import the Helidon BOM, so in your
     <dependency>
       <groupId>io.helidon</groupId>
       <artifactId>helidon-bom</artifactId>
-      <version>1.0.0</version>
+      <version>1.2.1</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -23,10 +23,10 @@ Helidon MicroProfile, obviously:
 
     <dependency>
       <groupId>io.helidon.microprofile.bundles</groupId>
-      <artifactId>helidon-microprofile-1.2</artifactId>
+      <artifactId>helidon-microprofile-2.2</artifactId>
     </dependency>
 
-(That will get its version from the BOM, which is `1.0.0` as you can
+(That will get its version from the BOM, which is `1.2.1` as you can
 see.)
 
 Now you'll also need `provided`-scoped dependencies on the two APIs
@@ -34,9 +34,9 @@ you'll be working with directly.  I like to specify versions in my
 `<dependencyManagement>` section, like this:
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-      <version>2.2</version>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>2.2.2</version>
       <type>jar</type>
     </dependency>
 
@@ -50,8 +50,8 @@ you'll be working with directly.  I like to specify versions in my
 ...and then in my `<dependencies>` stanza simply "point" to them, like so:
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -65,145 +65,45 @@ So that gets you the APIs you'll program against.  Now you need some
 implementations that will actually be there at runtime.
 
 For the JTA stuff, you'll want to have this in
-`<dependencyManagement>`:
+`<dependencies>`:
 
     <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-narayana-jta-cdi</artifactId>
-      <version>0.1.6</version>
-      <type>jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-narayana-jta-weld-se</artifactId>
-      <version>0.1.4</version>
-      <type>jar</type>
-    </dependency>
-
-...and then you'll want to "point at" it in `<dependencies>`:
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-narayana-jta-weld-se</artifactId>
+      <groupId>io.helidon.integrations.cdi</groupId>
+      <artifactId>helidon-integrations-cdi-jta-weld</artifactId>
       <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-narayana-jta-cdi</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
     </dependency>
     
 Note that these are in `runtime` scope, i.e. you don't compile against
-them; they're just drop-in components.  I've listed them as being
-`optional` here to emphasize that they're just a particular
-implementation of the JTA specification.  (You could write drop-in
-components for [Bitronix](https://github.com/bitronix/btm) for example
-instead of [Narayana](http://narayana.io/).)
-
-OK, you'll also need to bring in Weld's transactional notifier
-support&mdash;after all, we have a transaction manager now, so why not
-enable [transactional observer
-methods](http://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#transactional_observer_methods)?
-
-So in `<dependencyManagement>` you'll have:
-
-    <dependency>
-      <groupId>org.jboss.weld.module</groupId>
-      <artifactId>weld-jta</artifactId>
-      <version>3.0.3.Final</version>
-      <type>jar</type>
-    </dependency>
-
-...and in `<dependencies>` you'll have:
-
-    <dependency>
-      <groupId>org.jboss.weld.module</groupId>
-      <artifactId>weld-jta</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    
-Once again, note this is in `runtime` scope; it's a drop-in.
+them; they're just drop-in components.
 
 All right, now let's start building up JPA support.  The first thing
 we'll need is a connection pool, so let's use Helidon's.  In
-`<dependencyManagement>` you should do this:
-
-    <dependency>
-      <groupId>io.helidon.integrations.cdi</groupId>
-      <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-      <version>1.0.0</version>
-      <type>jar</type>
-    </dependency>
-
-Then in `<dependencies>` you'll have:
+`<dependencies>` you should do this:
 
     <dependency>
       <groupId>io.helidon.integrations.cdi</groupId>
       <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
       <scope>runtime</scope>
-      <optional>true</optional>
     </dependency>
     
-Once again, it's `runtime` and `optional` to indicate that you can
-pick any connection pool you wish so long as it has CDI support,
-i.e. so long as other components can look up a `DataSource` with
-`@Named` on it.
-
-Next, we'll need a JPA implementation.  Here's Eclipselink in
-`<dependencyManagement>`:
+Next, we need a component that will bring in a JPA provider and will
+adapt that provider to how it will be used.  Put this in your
+`<dependencies>` stanza:
 
     <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>org.eclipse.persistence.jpa</artifactId>
-      <version>2.7.3</version>
-      <type>jar</type>
-    </dependency>
-      
-...and in `<dependencies>`:
-
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>org.eclipse.persistence.jpa</artifactId>
+      <groupId>io.helidon.integrations.cdi</groupId>
+      <artifactId>helidon-eclipselink-cdi</artifactId>
       <scope>runtime</scope>
-      <optional>true</optional>
     </dependency>
     
-Note again that I've listed it as `optional` as nothing internally
-cares whether you're using Eclipselink or, say, Hibernate.
-
-We'll need a way to tell Eclipselink that it is not going to be
-running in a giant snarling Java EE server, but neither, exactly, is
-it going to be running in true SE mode.  So put this in your
-`<dependencyManagement>` stanza:
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-eclipselink-cdi</artifactId>
-      <version>0.0.1</version>
-      <type>jar</type>
-    </dependency>
-      
-...and this in your `<dependencies>` stanza:
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-eclipselink-cdi</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    
-Another `runtime` `optional` component.
+Another `runtime` component.
 
 A database for testing would be handy, so put this in your `<dependencyManagement>` stanza:
 
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.197</version>
+      <version>1.4.199</version>
       <type>jar</type>
     </dependency>
 
@@ -216,42 +116,14 @@ A database for testing would be handy, so put this in your `<dependencyManagemen
       <scope>test</scope>
     </dependency>
 
-Now we need the CDI glue to stitch this together.  Put this in your
-`<dependencyManagement>` stanza:
+Now, finally, we need the CDI glue to stitch this together.  Put this
+in your `<dependencies>` stanza:
 
     <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-jpa-cdi</artifactId>
-      <version>0.4.1</version>
-      <type>jar</type>
-    </dependency>
-      
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-jpa-weld-se</artifactId>
-      <version>0.4.2</version>
-      <type>jar</type>
-    </dependency>
-      
-...and this in your `<dependencies>` stanza:
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-jpa-cdi</artifactId>
+      <groupId>io.helidon.integrations.cdi</groupId>
+      <artifactId>helidon-integrations-cdi-jpa</artifactId>
       <scope>runtime</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-jpa-weld-se</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-    
-You'll note that I've marked `microbean-jpa-cdi` as not being
-`optional`.  That is because it doesn't care what CDI implementation
-you're using or what JPA implementation you're using; it's just glue
-to make sure the two parts work together.
 
 Then there are some goodies that really are optional.  Woodstox will
 make XML parsing much faster, so it's nice to put this in your
@@ -279,7 +151,7 @@ Jandex will make annotation scanning super fast so do this in your
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jandex</artifactId>
-      <version>2.0.5.Final</version>
+      <version>2.1.1.Final</version>
       <type>jar</type>
     </dependency>
       
@@ -300,10 +172,11 @@ this (obviously sanity-check the versions if you like):
 
         <!-- Imports. -->
 
+
         <dependency>
           <groupId>io.helidon</groupId>
           <artifactId>helidon-bom</artifactId>
-          <version>1.0.0</version>
+          <version>1.2.1</version>
           <type>pom</type>
           <scope>import</scope>
         </dependency>
@@ -316,88 +189,29 @@ this (obviously sanity-check the versions if you like):
           <groupId>com.fasterxml.woodstox</groupId>
           <artifactId>woodstox-core</artifactId>
           <version>5.2.0</version>
-          <type>jar</type>
         </dependency>
 
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
-          <version>1.4.197</version>
-          <type>jar</type>
+          <version>1.4.199</version>
         </dependency>
 
         <dependency>
-          <groupId>io.helidon.integrations.cdi</groupId>
-          <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
-          <version>1.0.0</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>javax.persistence</groupId>
-          <artifactId>javax.persistence-api</artifactId>
-          <version>2.2</version>
-          <type>jar</type>
+          <groupId>jakarta.persistence</groupId>
+          <artifactId>jakarta.persistence-api</artifactId>
+          <version>2.2.2</version>
         </dependency>
 
         <dependency>
           <groupId>javax.transaction</groupId>
           <artifactId>javax.transaction-api</artifactId>
           <version>1.2</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.eclipse.persistence</groupId>
-          <artifactId>org.eclipse.persistence.jpa</artifactId>
-          <version>2.7.3</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.jboss</groupId>
-          <artifactId>jandex</artifactId>
-          <version>2.0.5.Final</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.jboss.weld.module</groupId>
-          <artifactId>weld-jta</artifactId>
-          <version>3.0.3.Final</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.microbean</groupId>
-          <artifactId>microbean-eclipselink-cdi</artifactId>
-          <version>0.2.0</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.microbean</groupId>
-          <artifactId>microbean-jpa-cdi</artifactId>
-          <version>0.4.1</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.microbean</groupId>
-          <artifactId>microbean-jpa-weld-se</artifactId>
-          <version>0.4.2</version>
-          <type>jar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.microbean</groupId>
-          <artifactId>microbean-narayana-jta-weld-se</artifactId>
-          <version>0.2.4</version>
-          <type>jar</type>
         </dependency>
 
       </dependencies>
     </dependencyManagement>
+
 
     <dependencies>
 
@@ -408,12 +222,14 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
+        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
+        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
@@ -432,60 +248,24 @@ this (obviously sanity-check the versions if you like):
         <groupId>io.helidon.integrations.cdi</groupId>
         <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
         <scope>runtime</scope>
-        <optional>true</optional>
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.persistence</groupId>
-        <artifactId>org.eclipse.persistence.jpa</artifactId>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss</groupId>
-        <artifactId>jandex</artifactId>
+        <groupId>io.helidon.integrations.cdi</groupId>
+        <artifactId>helidon-integrations-cdi-eclipselink</artifactId>
         <scope>runtime</scope>
       </dependency>
 
       <dependency>
-        <groupId>org.jboss.weld.module</groupId>
-        <artifactId>weld-jta</artifactId>
+        <groupId>io.helidon.integrations.cdi</groupId>
+        <artifactId>helidon-integrations-cdi-jpa</artifactId>
         <scope>runtime</scope>
       </dependency>
 
       <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-eclipselink-cdi</artifactId>
+        <groupId>io.helidon.integrations.cdi</groupId>
+        <artifactId>helidon-integrations-cdi-jta-weld</artifactId>
         <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-jpa-cdi</artifactId>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-jpa-weld-se</artifactId>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-narayana-jta-weld-se</artifactId>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-
-      <dependency>
-        <groupId>org.microbean</groupId>
-        <artifactId>microbean-narayana-jta-cdi</artifactId>
-        <scope>runtime</scope>
-        <optional>true</optional>
       </dependency>
 
 
@@ -493,8 +273,9 @@ this (obviously sanity-check the versions if you like):
 
 
       <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>javax.persistence-api</artifactId>
+        <groupId>jakarta.persistence</groupId>
+        <artifactId>jakarta.persistence-api</artifactId>
+        <type>jar</type>
         <scope>provided</scope>
       </dependency>
 
@@ -510,7 +291,7 @@ this (obviously sanity-check the versions if you like):
 
       <dependency>
         <groupId>io.helidon.microprofile.bundles</groupId>
-        <artifactId>helidon-microprofile-1.2</artifactId>
+        <artifactId>helidon-microprofile-2.2</artifactId>
       </dependency>
 
 
@@ -528,8 +309,8 @@ The support I've added to Helidon MicroProfile looks as much like Java
 EE as possible, while using CDI and only CDI as the backplane.
 
 Since we're using CDI, create a
-`src/main/resources/META-INF/beans.xml` file and make it look like
-this:
+`src/main/resources/META-INF/beans.xml` file and make it look exactly
+like this:
 
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1041,115 +822,156 @@ Now when you run `mvn test` you should see output kind of like this:
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running io.github.ljnelson.helidon.mp.jpa.TestJPAIntegration
-Feb 07, 2019 5:14:34 PM org.jboss.weld.bootstrap.events.BeforeBeanDiscoveryImpl addAnnotatedType
-WARN: WELD-000146: BeforeBeanDiscovery.addAnnotatedType(AnnotatedType<?>) used for class org.glassfish.jersey.ext.cdi1x.internal.CdiComponentProvider$JaxRsParamProducer is deprecated from CDI 1.1!
-Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.server
-FINE: Configured server platform: org.microbean.eclipselink.cdi.CDISEPlatform
-Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test
-INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.3.v20180807-4be1041
-Feb 07, 2019 5:14:37 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:20 PM com.arjuna.ats.jta.common.JTAEnvironmentBean setXaRecoveryNodes
+DEBUG: Setting up node identifiers '[1]' for which recovery will be performed
+Aug 28, 2019 12:26:22 PM io.helidon.microprofile.security.SecurityMpService configure
+INFO: Security extension for microprofile is enabled, yet security configuration is missing from config (requires providers configuration at key security.providers). Security will not have any valid provider.
+Aug 28, 2019 12:26:22 PM io.smallrye.openapi.api.OpenApiDocument initialize
+INFO: OpenAPI document initialized: io.smallrye.openapi.api.models.OpenAPIImpl@65f2f9b0
+Aug 28, 2019 12:26:23 PM io.helidon.webserver.NettyWebServer <init>
+INFO: Version: 1.2.1
+Aug 28, 2019 12:26:23 PM io.helidon.webserver.NettyWebServer lambda$start$8
+INFO: Channel '@default' started: [id: 0x3c0e6a63, L:/0:0:0:0:0:0:0:0:7001]
+Aug 28, 2019 12:26:23 PM io.helidon.microprofile.server.ServerImpl lambda$start$10
+INFO: Server started on http://localhost:7001 (and all other host addresses) in 103 milliseconds.
+Aug 28, 2019 12:26:24 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.server
+FINE: Configured server platform: io.helidon.integrations.cdi.eclipselink.CDISEPlatform
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test
+INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.4.v20190115-ad5b7c6b2a
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test
+INFO: Server: CDISEPlatform
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: connecting(DatabaseLogin(
 	platform=>H2Platform
 	user name=> ""
 	connector=>JNDIConnector datasource name=>null
 ))
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:25 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-1 - Starting...
+Aug 28, 2019 12:26:25 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-1 - Start completed.
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: Connected: jdbc:h2:mem:test
 	User: SA
-	Database: H2  Version: 1.4.197 (2018-03-18)
-	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+	Database: H2  Version: 1.4.199 (2019-03-13)
+	Driver: H2 JDBC Driver  Version: 1.4.199 (2019-03-13)
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: connecting(DatabaseLogin(
 	platform=>H2Platform
 	user name=> ""
 	connector=>JNDIConnector datasource name=>null
 ))
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:25 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: Connected: jdbc:h2:mem:test
 	User: SA
-	Database: H2  Version: 1.4.197 (2018-03-18)
-	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
-INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test login successful
-Feb 07, 2019 5:14:38 PM com.arjuna.common.util.propertyservice.AbstractPropertiesFactory getPropertiesFromFile
-WARN: ARJUNA048002: Could not find configuration file, URL was: null
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+	Database: H2  Version: 1.4.199 (2019-03-13)
+	Driver: H2 JDBC Driver  Version: 1.4.199 (2019-03-13)
+Aug 28, 2019 12:26:26 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test login successful
+Aug 28, 2019 12:26:26 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.sql
 FINE: SELECT ID, FIRSTPART, SECONDPART FROM GREETING WHERE (FIRSTPART = ?)
-	bind => [1 parameter bound]
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+	bind => [hello]
+Aug 28, 2019 12:26:26 PM io.helidon.webserver.NettyWebServer lambda$start$6
+INFO: Channel '@default' closed: [id: 0x3c0e6a63, L:/0:0:0:0:0:0:0:0:7001]
+Aug 28, 2019 12:26:26 PM io.helidon.microprofile.server.ServerImpl lambda$stopWebServer$12
+INFO: Server stopped in 23 milliseconds.
+Aug 28, 2019 12:26:26 PM com.zaxxer.hikari.HikariDataSource close
+INFO: HikariPool-1 - Shutdown initiated...
+Aug 28, 2019 12:26:26 PM com.zaxxer.hikari.HikariDataSource close
+INFO: HikariPool-1 - Shutdown completed.
+Aug 28, 2019 12:26:26 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: disconnect
-Feb 07, 2019 5:14:38 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
-INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test logout successful
-Feb 07, 2019 5:14:39 PM org.jboss.weld.bootstrap.events.BeforeBeanDiscoveryImpl addAnnotatedType
-WARN: WELD-000146: BeforeBeanDiscovery.addAnnotatedType(AnnotatedType<?>) used for class org.glassfish.jersey.ext.cdi1x.internal.CdiComponentProvider$JaxRsParamProducer is deprecated from CDI 1.1!
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.server
-FINE: Configured server platform: org.microbean.eclipselink.cdi.CDISEPlatform
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test
-INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.3.v20180807-4be1041
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:26 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test logout successful
+Aug 28, 2019 12:26:27 PM io.helidon.microprofile.security.SecurityMpService configure
+INFO: Security extension for microprofile is enabled, yet security configuration is missing from config (requires providers configuration at key security.providers). Security will not have any valid provider.
+Aug 28, 2019 12:26:27 PM io.smallrye.openapi.api.OpenApiDocument initialize
+INFO: OpenAPI document initialized: io.smallrye.openapi.api.models.OpenAPIImpl@594131f2
+Aug 28, 2019 12:26:27 PM io.helidon.webserver.NettyWebServer <init>
+INFO: Version: 1.2.1
+Aug 28, 2019 12:26:27 PM io.helidon.webserver.NettyWebServer lambda$start$8
+INFO: Channel '@default' started: [id: 0x569cf601, L:/0:0:0:0:0:0:0:0:7001]
+Aug 28, 2019 12:26:27 PM io.helidon.microprofile.server.ServerImpl lambda$start$10
+INFO: Server started on http://localhost:7001 (and all other host addresses) in 3 milliseconds.
+Aug 28, 2019 12:26:27 PM com.arjuna.ats.arjuna.recovery.TransactionStatusManager addService
+DEBUG: com.arjuna.ats.arjuna.recovery.ActionStatusService starting
+Aug 28, 2019 12:26:27 PM com.arjuna.ats.internal.arjuna.recovery.TransactionStatusManagerItem <init>
+DEBUG: TransactionStatusManagerItem host: {0} port: {1}
+Aug 28, 2019 12:26:27 PM com.arjuna.ats.arjuna.recovery.TransactionStatusManager start
+INFO: ARJUNA012170: TransactionStatusManager started on port 53066 and host 127.0.0.1 with service com.arjuna.ats.arjuna.recovery.ActionStatusService
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.server
+FINE: Configured server platform: io.helidon.integrations.cdi.eclipselink.CDISEPlatform
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test
+INFO: EclipseLink, version: Eclipse Persistence Services - 2.7.4.v20190115-ad5b7c6b2a
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test
+INFO: Server: CDISEPlatform
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: connecting(DatabaseLogin(
 	platform=>H2Platform
 	user name=> ""
 	connector=>JNDIConnector datasource name=>null
 ))
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:27 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-2 - Starting...
+Aug 28, 2019 12:26:27 PM com.zaxxer.hikari.HikariDataSource <init>
+INFO: HikariPool-2 - Start completed.
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: Connected: jdbc:h2:mem:test
 	User: SA
-	Database: H2  Version: 1.4.197 (2018-03-18)
-	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+	Database: H2  Version: 1.4.199 (2019-03-13)
+	Driver: H2 JDBC Driver  Version: 1.4.199 (2019-03-13)
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: connecting(DatabaseLogin(
 	platform=>H2Platform
 	user name=> ""
 	connector=>JNDIConnector datasource name=>null
 ))
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: Connected: jdbc:h2:mem:test
 	User: SA
-	Database: H2  Version: 1.4.197 (2018-03-18)
-	Driver: H2 JDBC Driver  Version: 1.4.197 (2018-03-18)
-Feb 07, 2019 5:14:39 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
-INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test login successful
-Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+	Database: H2  Version: 1.4.199 (2019-03-13)
+	Driver: H2 JDBC Driver  Version: 1.4.199 (2019-03-13)
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test login successful
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.sql
 FINE: UPDATE SEQUENCE SET SEQ_COUNT = SEQ_COUNT + ? WHERE SEQ_NAME = ?
-	bind => [2 parameters bound]
-Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+	bind => [50, SEQ_GEN]
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.sql
 FINE: SELECT SEQ_COUNT FROM SEQUENCE WHERE SEQ_NAME = ?
-	bind => [1 parameter bound]
-Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.sql
+	bind => [SEQ_GEN]
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.sql
 FINE: INSERT INTO GREETING (ID, FIRSTPART, SECONDPART) VALUES (?, ?, ?)
-	bind => [3 parameters bound]
-Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
+	bind => [1, hello, hello]
+Aug 28, 2019 12:26:27 PM io.helidon.webserver.NettyWebServer lambda$start$6
+INFO: Channel '@default' closed: [id: 0x569cf601, L:/0:0:0:0:0:0:0:0:7001]
+Aug 28, 2019 12:26:27 PM io.helidon.microprofile.server.ServerImpl lambda$stopWebServer$12
+INFO: Server stopped in 2 milliseconds.
+Aug 28, 2019 12:26:27 PM com.zaxxer.hikari.HikariDataSource close
+INFO: HikariPool-2 - Shutdown initiated...
+Aug 28, 2019 12:26:27 PM com.zaxxer.hikari.HikariDataSource close
+INFO: HikariPool-2 - Shutdown completed.
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
 CONFIG: disconnect
-Feb 07, 2019 5:14:40 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test.connection
-INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/_test logout successful
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.538 s - in io.github.ljnelson.helidon.mp.jpa.TestJPAIntegration
+Aug 28, 2019 12:26:27 PM org.eclipse.persistence.session./file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test.connection
+INFO: /file:/Users/LANELSON/Projects/github/ljnelson/helidon-mp-jpa/target/classes/_test logout successful
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.189 s - in io.github.ljnelson.helidon.mp.jpa.TestJPAIntegration
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  17.236 s
+[INFO] Finished at: 2019-08-28T12:26:28-07:00
+[INFO] ------------------------------------------------------------------------
 ```
 
 Yay!
 
 ## Related Projects
 
-These are my skunkworks projects:
-* [microbean-eclipselink-cdi](https://microbean.github.io/microbean-eclipselink-cdi/index.html):
-  Provides an Eclipselink platform that uses CDI instead of JNDI for
-  transaction resolution.
-* [microbean-hibernate-cdi](https://microbean.github.io/microbean-hibernate-cdi/index.html):
-  Provides a Hibernate platform that uses CDI instead of JNDI for
-  transaction resolution.
-* [microbean-jpa-cdi](https://microbean.github.io/microbean-jpa-cdi/index.html):
-  Provides JPA-independent CDI glue.
-* [microbean-jpa-weld-se](https://microbean.github.io/microbean-jpa-weld-se/index.html):
-  Provides injection of `@PersistenceUnit` and `@PersistenceContext`
-  injection points in as native a way as possible for Weld-based CDI implementations.
-* [microbean-narayana-jta-cdi](https://microbean.github.io/microbean-narayana-jta-cdi/index.html):
-  Provides the CDI-implementation-independent bits required to get JTA
-  running in CDI SE.
-* [microbean-narayana-jta-weld-se](https://microbean.github.io/microbean-narayana-jta-weld-se/index.html):
-  Provides transactional observer support for Weld-based CDI
-  implementations.
-
-These are other supporting projects:
 * [Narayana](https://github.com/jbosstm/narayana): A JTA transaction
   manager.  Battle-tested.  I [helped with the CDI
   internals](https://github.com/jbosstm/narayana/pull/1346).
@@ -1163,4 +985,4 @@ These are other supporting projects:
 * [Woodstox](https://github.com/FasterXML/woodstox): Stax XML parser
   that flies.
 * [Jandex](https://github.com/wildfly/jandex): Don't scan annotations
-  by loading classes; look at their efficient indices instead.
+  by loading classes; look at efficient indices instead.

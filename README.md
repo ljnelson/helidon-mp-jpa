@@ -37,14 +37,12 @@ you'll be working with directly.  I like to specify versions in my
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
       <version>2.2.2</version>
-      <type>jar</type>
     </dependency>
 
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>javax.transaction-api</artifactId>
       <version>1.2</version>
-      <type>jar</type>
     </dependency>
       
 ...and then in my `<dependencies>` stanza simply "point" to them, like so:
@@ -104,7 +102,6 @@ A database for testing would be handy, so put this in your `<dependencyManagemen
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.4.199</version>
-      <type>jar</type>
     </dependency>
 
 ...and this in your `<dependencies>` stanza:
@@ -112,7 +109,6 @@ A database for testing would be handy, so put this in your `<dependencyManagemen
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <type>jar</type>
       <scope>test</scope>
     </dependency>
 
@@ -133,7 +129,6 @@ make XML parsing much faster, so it's nice to put this in your
       <groupId>com.fasterxml.woodstox</groupId>
       <artifactId>woodstox-core</artifactId>
       <version>5.2.0</version>
-      <type>jar</type>
     </dependency>
       
 ...and this in your `<dependencies>` stanza:
@@ -152,7 +147,6 @@ Jandex will make annotation scanning super fast so do this in your
       <groupId>org.jboss</groupId>
       <artifactId>jandex</artifactId>
       <version>2.1.1.Final</version>
-      <type>jar</type>
     </dependency>
       
 ...and this in your `<dependencies>` stanza:
@@ -222,14 +216,12 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <type>jar</type>
         <scope>test</scope>
       </dependency>
 
@@ -275,7 +267,6 @@ this (obviously sanity-check the versions if you like):
       <dependency>
         <groupId>jakarta.persistence</groupId>
         <artifactId>jakarta.persistence-api</artifactId>
-        <type>jar</type>
         <scope>provided</scope>
       </dependency>
 
